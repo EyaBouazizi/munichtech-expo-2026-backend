@@ -2,25 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sponsor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Http\JsonResponse;
 
 class SponsorController extends Controller
 {
+    public function index()
+    {
+        return Sponsor::all();
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
-            'company' => 'required|string|max:255',
-            'contact' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'level' => 'required|string',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'tier' => 'required|string|max:50',
+            'pricing' => 'nullable|numeric',
+            'benefits' => 'nullable|string',
+            'logo_url' => 'nullable|url',
+            'contact_email' => 'nullable|email',
+            'meta' => 'nullable|array',
         ]);
 
-        // Store locally (optional: you can create a sponsors table later)
-        $sponsors = Session::get('sponsors', []);
-        $sponsors[] = $request->all();
-        Session::put('sponsors', $sponsors);
+        $sponsor = Sponsor::create($validated);
 
-        return redirect()->back()->with('sponsor_success', 'Thank you! Your sponsorship request has been submitted.');
+        return response()->json($sponsor, 201);
+    }
+
+    public function show(Sponsor $sponsor)
+    {
+        return $sponsor;
+    }
+
+    public function update(Request $request, Sponsor $sponsor)
+    {
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'tier' => 'sometimes|required|string|max:50',
+            'pricing' => 'nullable|numeric',
+            'benefits' => 'nullable|string',
+            'logo_url' => 'nullable|url',
+            'contact_email' => 'nullable|email',
+            'meta' => 'nullable|array',
+        ]);
+
+        $sponsor->update($validated);
+
+        return response()->json($sponsor);
+    }
+
+    public function destroy(Sponsor $sponsor)
+    {
+        $sponsor->delete();
+
+        return response()->json(null, 204);
     }
 }

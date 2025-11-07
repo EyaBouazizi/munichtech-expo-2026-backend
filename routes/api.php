@@ -3,17 +3,32 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\SponsorController;
+use App\Http\Controllers\ExhibitorController;
+use App\Http\Controllers\PaymentController;
+
 
 Route::get('/health', function() {
     return response()->json(['status' => 'ok', 'time' => now()]);
 });
 
+// Ticket API routes
 Route::get('/tickets', [TicketController::class, 'index']);
 Route::post('/tickets', [TicketController::class, 'store']);
 Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
+// Sponsors API routes
+Route::get('/sponsors', [SponsorController::class, 'index']);
+Route::post('/sponsors', [SponsorController::class, 'store']);
+Route::get('/sponsors/{id}', [SponsorController::class, 'show']);
 
+// Exhibitors API routes
+Route::get('/exhibitors', [ExhibitorController::class, 'index']);
+Route::post('/exhibitors', [ExhibitorController::class, 'store']);
+Route::get('/exhibitors/{id}', [ExhibitorController::class, 'show']);
 
+// Payment API route
+Route::post('/payment/create', [PaymentController::class, 'createSession']);
 
 
 
