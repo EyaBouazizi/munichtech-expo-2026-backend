@@ -10,8 +10,15 @@ class Ticket extends Model
     use HasFactory;
 
     protected $fillable = [
+        'type',
+        'price',
         'name',
         'email',
-        'ticket_type',
+        'status',
+        'meta',
+    ];
+
+    protected $casts = [
+        'meta' => 'array',
     ];
 }

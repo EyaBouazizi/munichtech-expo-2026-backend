@@ -13,11 +13,14 @@ return new class extends Migration
 {
     Schema::create('tickets', function (Blueprint $table) {
         $table->id();
-        $table->string('name');
-        $table->string('email');
-        $table->string('ticket_type');
+        $table->string('type'); // e.g., Expo Visitor, General, Startup, Investor, VIP, Student
+        $table->decimal('price', 10, 2)->nullable();
+        $table->string('name')->nullable(); // purchaser name
+        $table->string('email')->nullable();
+        $table->string('status')->default('pending'); // pending, paid, cancelled
+        $table->json('meta')->nullable();
         $table->timestamps();
-    });
+        });
 }
 
     /**

@@ -4,35 +4,36 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ticket;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 class TicketController extends Controller
 {
-    // Show the ticket form
-    public function create()
+    public function index(): JsonResponse
     {
-        $tickets = [
-            ['type' => 'Expo Visitor Pass', 'price' => 249],
-            ['type' => 'General Pass', 'price' => 799],
-            ['type' => 'Startup Pass', 'price' => 999],
-            ['type' => 'Investor Pass', 'price' => 1499],
-            ['type' => 'VIP Executive Pass', 'price' => 2499],
-            ['type' => 'Researchers / Students / Job Seekers', 'price' => 99],
-        ];
-
-        return view('tickets.create', compact('tickets'));
+        $tickets = Ticket::orderBy('created_at', 'desc')->paginate(25);
+        return response()->json($tickets);
     }
 
-    // Handle form submission
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'ticket_type' => 'required|string',
+        $data = $request->validate([
+            'type' => 'required|string',
+            'price' => 'nullable|numeric',
+            'name' => 'nullable|string',
+            'email' => 'nullable|email',
+            'meta' => 'nullable|array',
         ]);
 
-        Ticket::create($request->all());
+        $ticket = Ticket::create($data);
 
-        return redirect()->back()->with('success', 'Ticket booked successfully!');
+        // TODO: send email or trigger webhook after payment confirmation
+        return response()->json(['success' => true, 'ticket' => $ticket], 201);
+    }
+
+    public function show($id): JsonResponse
+    {
+        $ticket = Ticket::findOrFail($id);
+        return response()->json($ticket);
     }
 }
